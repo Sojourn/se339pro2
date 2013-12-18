@@ -2,23 +2,24 @@ package edu.iastate.pro2.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.sql.SQLException;
+import java.sql.Connection;
 
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
-import edu.iastate.pro2.model.CustomersTable;
-import edu.iastate.pro2.model.MoviesTable;
-import edu.iastate.pro2.model.RentalDatabase;
-import edu.iastate.pro2.model.SqlTableModel;
+import edu.iastate.pro2.controllers.CustomersController;
+import edu.iastate.pro2.controllers.MoviesController;
+import edu.iastate.pro2.model.DatabaseUtil;
 
 public class MovieRentalApplication {
-	private RentalDatabase db;
-	private JFrame window;
-	private JTabbedPane tabbedPane;
 	private CustomersPanel customersPanel;
 	private MoviesPanel moviesPanel;
+
+	private Connection connection;
+
+	private MoviesController moviesController;
+	private CustomersController customersController;
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -32,56 +33,46 @@ public class MovieRentalApplication {
 	}
 
 	public MovieRentalApplication() {
-		initializeDB();
-		initializeUI();
+		initializeViews();
+		initializeDatabaseConnection();
+		initializeControllers();
 	}
 
-	private void initializeDB() {
+	private void initializeDatabaseConnection() {
 		try {
-			db = new RentalDatabase();
+			connection = DatabaseUtil.connect("rental.db");
+			DatabaseUtil.prepareDatabaseSchema(connection);
 		} catch (Exception e) {
-			System.err.println("Unable to open rental database");
-			e.printStackTrace();
-			System.exit(-1);
+			handleException(e);
 		}
 	}
 
-	private void initializeUI() {
-		window = new JFrame();
-		window.setLayout(new BorderLayout(0, 0));
-		
-//		try {
-//			moviesModel = new SqlTableModel();
-//			moviesModel.setData(db.queryMovies.executeQuery());
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		moviesView = new JTable(moviesModel);
-//		window.add(new JScrollPane(moviesView));
-		
-		SqlTableModel moviesModel = new SqlTableModel();
-		SqlTableModel customersModel = new SqlTableModel();
-		try {
-			moviesModel.setData(db.query("select * from " + MoviesTable.TABLE_NAME));
-			customersModel.setData(db.query("select * from " + CustomersTable.TABLE_NAME));
-		} catch (SQLException e) {
-		}
-		
+	private void initializeViews() {
 		moviesPanel = new MoviesPanel();
-		moviesPanel.setMoviesModel(moviesModel);
-		
 		customersPanel = new CustomersPanel();
-		customersPanel.setCustomersModel(customersModel);
-		
-		tabbedPane = new JTabbedPane();
+
+		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Movies", moviesPanel);
 		tabbedPane.addTab("Customers", customersPanel);
+
+		JFrame window = new JFrame();
+		window.setLayout(new BorderLayout(0, 0));
 		window.add(tabbedPane);
-		
-		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		window.setMinimumSize(new Dimension(640, 480));
+
 		window.setTitle("Movie Rental Application");
+		window.setMinimumSize(new Dimension(640, 480));
+		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		window.setVisible(true);
+	}
+
+	private void initializeControllers() {
+		moviesController = new MoviesController(connection, moviesPanel);
+		customersController = new CustomersController(connection,
+				customersPanel);
+	}
+
+	public static void handleException(Exception e) {
+		e.printStackTrace();
+		System.exit(-1);
 	}
 }

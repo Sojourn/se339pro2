@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 @SuppressWarnings("serial")
-public class SqlTableModel extends AbstractTableModel {
+public class SQLTableModel extends AbstractTableModel {
 	private final ArrayList<String[]> data = new ArrayList<String[]>();
 	private String[] columnNames;
 	private int columnCount;
@@ -44,7 +44,7 @@ public class SqlTableModel extends AbstractTableModel {
 				row[i] = result.getString(i + 1);
 		}
 
-		fireTableDataChanged();
+		fireTableStructureChanged();
 	}
 
 	@Override
