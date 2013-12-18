@@ -10,19 +10,31 @@ import java.sql.Statement;
 public class RentalDatabase {
 	private final Connection connection;
 	public final PreparedStatement queryMovies;
-	
+
 	public RentalDatabase() throws ClassNotFoundException, SQLException {
 		Class.forName("org.sqlite.JDBC");
 		connection = DriverManager.getConnection("jdbc:sqlite:rental.db");
 		createSchema();
-		queryMovies = connection.prepareStatement("select * from " + MoviesTable.TABLE_NAME + ";");
+		queryMovies = connection.prepareStatement("select * from "
+				+ MoviesTable.TABLE_NAME + ";");
+	}
+
+	public ResultSet query(String sql) {
+		try {
+			return connection.createStatement().executeQuery(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.exit(-1);
+			return null;
+		}
 	}
 
 	private void createSchema() throws SQLException {
 		Statement statement = connection.createStatement();
 
 		statement.execute("CREATE TABLE IF NOT EXISTS " + MoviesTable.SCHEMA);
-		statement.execute("CREATE TABLE IF NOT EXISTS " + CustomersTable.SCHEMA);
+		statement
+				.execute("CREATE TABLE IF NOT EXISTS " + CustomersTable.SCHEMA);
 		statement.execute("CREATE TABLE IF NOT EXISTS " + RentalsTable.SCHEMA);
 
 		statement.close();
