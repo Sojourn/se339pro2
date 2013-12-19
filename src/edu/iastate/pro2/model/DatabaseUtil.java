@@ -16,8 +16,7 @@ public class DatabaseUtil {
 		Statement statement = connection.createStatement();
 
 		statement.execute("CREATE TABLE IF NOT EXISTS " + MoviesTable.SCHEMA);
-		statement
-				.execute("CREATE TABLE IF NOT EXISTS " + CustomersTable.SCHEMA);
+		statement.execute("CREATE TABLE IF NOT EXISTS " + CustomersTable.SCHEMA);
 		statement.execute("CREATE TABLE IF NOT EXISTS " + RentalsTable.SCHEMA);
 
 		statement.close();

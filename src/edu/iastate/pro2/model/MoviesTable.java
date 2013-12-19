@@ -11,8 +11,6 @@ public class MoviesTable {
 	public static final String SCHEMA = TABLE_NAME + "(" +
 			ROW_NAME + " TEXT PRIMARY KEY NOT NULL," +
 			ROW_TYPE + " TEXT NOT NULL," +
-			ROW_GENERE + " TEXT NOT NULL," +
-			ROW_RATING + " TEXT NOT NULL," +
 			ROW_QUANTITY + " INTEGER NOT NULL" +
 			");";
 }
